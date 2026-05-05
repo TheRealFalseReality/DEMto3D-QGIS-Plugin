@@ -282,7 +282,7 @@ class ThreeMF(QThread):
             One of TRAIL_MODE_RAISED, TRAIL_MODE_ENGRAVED, TRAIL_MODE_SEPARATE.
         width : float
             Half-width of the trail ribbon (mm).  The ribbon extends width/2
-            to each side of the centre-line.
+            to each side of the centerline.
         height : float
             Height of the ribbon above the terrain surface (used for RAISED
             and SEPARATE modes).
@@ -297,12 +297,15 @@ class ThreeMF(QThread):
         if len(polyline) < 2:
             return [], []
 
-        half_w = width / 2.0
+        half_width = width / 2.0
 
         if mode == TRAIL_MODE_ENGRAVED:
             z_top_offset = 0.0
             z_bot_offset = -depth
         else:
+            # RAISED or SEPARATE: ribbon sits on or above the terrain surface
+            z_top_offset = height
+            z_bot_offset = 0.0
             # RAISED or SEPARATE: ribbon sits on or above the terrain surface
             z_top_offset = height
             z_bot_offset = 0.0
@@ -344,10 +347,10 @@ class ThreeMF(QThread):
 
             px, py = _perp(dx, dy)
 
-            tl = self.pto(x=pt.x + px * half_w, y=pt.y + py * half_w, z=pt.z + z_top_offset)
-            tr = self.pto(x=pt.x - px * half_w, y=pt.y - py * half_w, z=pt.z + z_top_offset)
-            bl = self.pto(x=pt.x + px * half_w, y=pt.y + py * half_w, z=pt.z + z_bot_offset)
-            br = self.pto(x=pt.x - px * half_w, y=pt.y - py * half_w, z=pt.z + z_bot_offset)
+            tl = self.pto(x=pt.x + px * half_width, y=pt.y + py * half_width, z=pt.z + z_top_offset)
+            tr = self.pto(x=pt.x - px * half_width, y=pt.y - py * half_width, z=pt.z + z_top_offset)
+            bl = self.pto(x=pt.x + px * half_width, y=pt.y + py * half_width, z=pt.z + z_bot_offset)
+            br = self.pto(x=pt.x - px * half_width, y=pt.y - py * half_width, z=pt.z + z_bot_offset)
 
             top_left.append(_add(tl))
             top_right.append(_add(tr))

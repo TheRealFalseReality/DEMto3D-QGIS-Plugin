@@ -924,6 +924,10 @@ class DEMto3DDialog(QDialog, Ui_DEMto3DDialogBase):
                 "trail_layer": self._get_trail_layer(),
                 "trail_mode": self._get_trail_mode(),
                 "trail_width": self.ui.TrailWidthSpinBox.value(),
+                # TrailHeightSpinBox is labelled "Height / depth" and serves as
+                # both the raised height (RAISED/SEPARATE modes) and the engraved
+                # depth (ENGRAVED mode) so that a single intuitive control covers
+                # all three trail modes.
                 "trail_height": self.ui.TrailHeightSpinBox.value(),
                 "trail_depth": self.ui.TrailHeightSpinBox.value()}
 
