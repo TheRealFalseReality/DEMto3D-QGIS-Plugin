@@ -341,6 +341,68 @@ class Ui_DEMto3DDialogBase(object):
             QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout_8.addItem(spacerItem1)
         self.verticalLayout_8.addWidget(self.groupBox_2)
+
+        # Trail / Path overlay group box
+        self.groupBox_trail = QtWidgets.QGroupBox(parent=self.scrollAreaWidgetContents)
+        self.groupBox_trail.setObjectName("groupBox_trail")
+        self.verticalLayout_trail = QtWidgets.QVBoxLayout(self.groupBox_trail)
+        self.verticalLayout_trail.setObjectName("verticalLayout_trail")
+
+        # Enable checkbox
+        self.TrailCheckBox = QtWidgets.QCheckBox(parent=self.groupBox_trail)
+        self.TrailCheckBox.setObjectName("TrailCheckBox")
+        self.verticalLayout_trail.addWidget(self.TrailCheckBox)
+
+        # Content widget (hidden when unchecked)
+        self.trailContentWidget = QtWidgets.QWidget(parent=self.groupBox_trail)
+        self.trailContentWidget.setObjectName("trailContentWidget")
+        self.trailContentWidget.setEnabled(False)
+        self.gridLayout_trail = QtWidgets.QGridLayout(self.trailContentWidget)
+        self.gridLayout_trail.setObjectName("gridLayout_trail")
+        self.gridLayout_trail.setContentsMargins(0, 0, 0, 0)
+
+        # Layer selector
+        self.label_trail_layer = QtWidgets.QLabel(parent=self.trailContentWidget)
+        self.label_trail_layer.setObjectName("label_trail_layer")
+        self.gridLayout_trail.addWidget(self.label_trail_layer, 0, 0, 1, 1)
+        self.TrailLayerComboBox = QgsMapLayerComboBox(parent=self.trailContentWidget)
+        self.TrailLayerComboBox.setObjectName("TrailLayerComboBox")
+        self.gridLayout_trail.addWidget(self.TrailLayerComboBox, 0, 1, 1, 3)
+
+        # Trail mode
+        self.label_trail_mode = QtWidgets.QLabel(parent=self.trailContentWidget)
+        self.label_trail_mode.setObjectName("label_trail_mode")
+        self.gridLayout_trail.addWidget(self.label_trail_mode, 1, 0, 1, 1)
+        self.TrailModeComboBox = QtWidgets.QComboBox(parent=self.trailContentWidget)
+        self.TrailModeComboBox.setObjectName("TrailModeComboBox")
+        self.gridLayout_trail.addWidget(self.TrailModeComboBox, 1, 1, 1, 3)
+
+        # Trail width
+        self.label_trail_width = QtWidgets.QLabel(parent=self.trailContentWidget)
+        self.label_trail_width.setObjectName("label_trail_width")
+        self.gridLayout_trail.addWidget(self.label_trail_width, 2, 0, 1, 1)
+        self.TrailWidthSpinBox = QtWidgets.QDoubleSpinBox(parent=self.trailContentWidget)
+        self.TrailWidthSpinBox.setObjectName("TrailWidthSpinBox")
+        self.TrailWidthSpinBox.setMinimum(0.1)
+        self.TrailWidthSpinBox.setMaximum(50.0)
+        self.TrailWidthSpinBox.setSingleStep(0.1)
+        self.TrailWidthSpinBox.setValue(2.0)
+        self.gridLayout_trail.addWidget(self.TrailWidthSpinBox, 2, 1, 1, 1)
+
+        # Trail height/depth
+        self.label_trail_height = QtWidgets.QLabel(parent=self.trailContentWidget)
+        self.label_trail_height.setObjectName("label_trail_height")
+        self.gridLayout_trail.addWidget(self.label_trail_height, 3, 0, 1, 1)
+        self.TrailHeightSpinBox = QtWidgets.QDoubleSpinBox(parent=self.trailContentWidget)
+        self.TrailHeightSpinBox.setObjectName("TrailHeightSpinBox")
+        self.TrailHeightSpinBox.setMinimum(0.1)
+        self.TrailHeightSpinBox.setMaximum(20.0)
+        self.TrailHeightSpinBox.setSingleStep(0.1)
+        self.TrailHeightSpinBox.setValue(0.8)
+        self.gridLayout_trail.addWidget(self.TrailHeightSpinBox, 3, 1, 1, 1)
+
+        self.verticalLayout_trail.addWidget(self.trailContentWidget)
+        self.verticalLayout_8.addWidget(self.groupBox_trail)
         spacerItem2 = QtWidgets.QSpacerItem(
             20, 40,
             QtWidgets.QSizePolicy.Policy.Minimum,
@@ -406,6 +468,7 @@ class Ui_DEMto3DDialogBase(object):
         self.retranslateUi(DEMto3DDialogBase)
         self.RotationCheckBox.clicked['bool'].connect(self.LimitsParamGframe.setVisible)  # type: ignore
         self.SidesCheckBox.clicked['bool'].connect(self.borderModelLineEdit.setEnabled)  # type: ignore
+        self.TrailCheckBox.clicked['bool'].connect(self.trailContentWidget.setEnabled)  # type: ignore
         QtCore.QMetaObject.connectSlotsByName(DEMto3DDialogBase)
         DEMto3DDialogBase.setTabOrder(self.XMaxLineEdit, self.YMaxLineEdit)
         DEMto3DDialogBase.setTabOrder(self.YMaxLineEdit, self.XMinLineEdit)
@@ -476,11 +539,22 @@ class Ui_DEMto3DDialogBase(object):
         self.borderModelLineEdit.setText(_translate("DEMto3DDialogBase", "0"))
         self.SidesCheckBox.setText(_translate("DEMto3DDialogBase", "Build sides"))
         self.label_23.setText(_translate("DEMto3DDialogBase", "Border (mm):"))
-        self.groupBox_2.setTitle(_translate("DEMto3DDialogBase", "Output Format"))
+        self.groupBox_2.setTitle(_translate("DEMto3DDialogBase", "STL Output Format"))
         self.radioButton_binary.setText(_translate("DEMto3DDialogBase", "Binary Format"))
         self.radioButton_ascii.setText(_translate("DEMto3DDialogBase", "ASCII Format"))
+        self.groupBox_trail.setTitle(_translate("DEMto3DDialogBase", "Trail / Path overlay (3MF export)"))
+        self.TrailCheckBox.setText(_translate("DEMto3DDialogBase", "Include trail layer"))
+        self.label_trail_layer.setText(_translate("DEMto3DDialogBase", "Trail layer:"))
+        self.label_trail_mode.setText(_translate("DEMto3DDialogBase", "Trail mode:"))
+        self.TrailModeComboBox.addItem(_translate("DEMto3DDialogBase", "Raised (ridge above terrain)"))
+        self.TrailModeComboBox.addItem(_translate("DEMto3DDialogBase", "Engraved (groove into terrain)"))
+        self.TrailModeComboBox.addItem(_translate("DEMto3DDialogBase", "Separate mesh (multicolor / AMS)"))
+        self.label_trail_width.setText(_translate("DEMto3DDialogBase", "Width (mm):"))
+        self.TrailWidthSpinBox.setSuffix(_translate("DEMto3DDialogBase", " mm"))
+        self.label_trail_height.setText(_translate("DEMto3DDialogBase", "Height / depth (mm):"))
+        self.TrailHeightSpinBox.setSuffix(_translate("DEMto3DDialogBase", " mm"))
         self.ProgressLabel.setText(_translate("DEMto3DDialogBase", "TextLabel..."))
         self.cancelProgressToolButton.setText(_translate("DEMto3DDialogBase", "Cancel"))
         self.ParamPushButton.setText(_translate("DEMto3DDialogBase", "Settings"))
-        self.STLToolButton.setText(_translate("DEMto3DDialogBase", "Export to STL"))
+        self.STLToolButton.setText(_translate("DEMto3DDialogBase", "Export"))
         self.CancelToolButton.setText(_translate("DEMto3DDialogBase", "Close"))

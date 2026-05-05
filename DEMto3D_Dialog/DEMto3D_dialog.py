@@ -112,6 +112,11 @@ class DEMto3DDialog(QDialog, Ui_DEMto3DDialogBase):
         self.ui.mMapLayerComboBox.layerChanged.connect(self.get_currlayer)
         # endregion
 
+        # Trail layer combobox: only line vector layers
+        self.ui.TrailLayerComboBox.setFilters(QgsMapLayerProxyModel.Filter.LineLayer)
+        self.ui.TrailLayerComboBox.setAllowEmptyLayer(True)
+        self.ui.TrailLayerComboBox.setCurrentIndex(0)
+
         # region EXTENSION ACTION
         self.extent = None
 
@@ -322,23 +327,30 @@ class DEMto3DDialog(QDialog, Ui_DEMto3DDialogBase):
     def do_export(self):
 
         def export():
-            stl_file = QFileDialog.getSaveFileName(self, self.tr(
-                'Export to STL'), self.lastSavingPath + layer_name, filter="*.stl")
-            if stl_file[0] != '':
-                self.lastSavingPath = os.path.dirname(stl_file[0]) + '//'
-                Export_dialog.Export(self, parameters, stl_file[0])
+            export_filter = self.tr(
+                "3MF file (*.3mf);;STL file (*.stl)"
+            )
+            out_file = QFileDialog.getSaveFileName(
+                self,
+                self.tr('Export terrain model'),
+                self.lastSavingPath + layer_name,
+                filter=export_filter,
+            )
+            if out_file[0] != '':
+                self.lastSavingPath = os.path.dirname(out_file[0]) + '//'
+                Export_dialog.Export(self, parameters, out_file[0])
 
         parameters = self.get_parameters()
-        layer_name = self.layer.name() + '_model.stl'
+        layer_name = self.layer.name() + '_model'
         if parameters != 0:
             row_stl = int(
                 math.ceil(self.height / parameters["spacing_mm"]) + 1)
             col_stl = int(math.ceil(self.width / parameters["spacing_mm"]) + 1)
             tooMuchPoints = row_stl * col_stl > 500000
             if tooMuchPoints:
-                reply = QMessageBox.question(self, self.tr('Export to STL'),
+                reply = QMessageBox.question(self, self.tr('Export'),
                                              self.tr(
-                    'The construction of the STL file could takes several minutes. Do you want to continue?'),
+                    'The construction of the model could take several minutes. Do you want to continue?'),
                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
                 if reply == QMessageBox.StandardButton.Yes:
                     export()
@@ -841,6 +853,21 @@ class DEMto3DDialog(QDialog, Ui_DEMto3DDialogBase):
                 QMessageBox.warning(self, self.tr("Attention"), self.tr("Define print extent"))
             self.ui.BaseHeightLineEdit.clear()
 
+    def _get_trail_layer(self):
+        """Return the selected trail layer, or None if trail is disabled."""
+        if not self.ui.TrailCheckBox.isChecked():
+            return None
+        return self.ui.TrailLayerComboBox.currentLayer()
+
+    def _get_trail_mode(self):
+        """Return the trail mode string matching ThreeMF_Builder constants."""
+        from ..model_builder.ThreeMF_Builder import (
+            TRAIL_MODE_RAISED, TRAIL_MODE_ENGRAVED, TRAIL_MODE_SEPARATE
+        )
+        idx = self.ui.TrailModeComboBox.currentIndex()
+        modes = [TRAIL_MODE_RAISED, TRAIL_MODE_ENGRAVED, TRAIL_MODE_SEPARATE]
+        return modes[idx] if 0 <= idx < len(modes) else TRAIL_MODE_RAISED
+
     def get_parameters(self):
         projected = True
         if self.units == 6:  # Degree
@@ -893,7 +920,12 @@ class DEMto3DDialog(QDialog, Ui_DEMto3DDialogBase):
                 "divideCols": cols,
                 "borders": borders,
                 "has_borders": has_borders,
-                "stl_format": stl_format}
+                "stl_format": stl_format,
+                "trail_layer": self._get_trail_layer(),
+                "trail_mode": self._get_trail_mode(),
+                "trail_width": self.ui.TrailWidthSpinBox.value(),
+                "trail_height": self.ui.TrailHeightSpinBox.value(),
+                "trail_depth": self.ui.TrailHeightSpinBox.value()}
 
 
 class RectangleMapTool(QgsMapTool):
